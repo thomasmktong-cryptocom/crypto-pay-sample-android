@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
@@ -66,10 +68,23 @@ public class WebViewActivity extends AppCompatActivity {
                 }
             });
 
+            webView.setWebChromeClient(new WebChromeClient() {
+                @Override
+                public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+                    String debugMessage = consoleMessage.message() + " -- From line "
+                            + consoleMessage.lineNumber() + " of "
+                            + consoleMessage.sourceId();
+
+                    Toast.makeText(webView.getContext(), debugMessage, Toast.LENGTH_SHORT).show();
+                    return super.onConsoleMessage(consoleMessage);
+                }
+            });
+
             /*
              * Enable JavaScript and load `payment_url` when creating the WebView.
              */
             webView.getSettings().setJavaScriptEnabled(true);
+            webView.getSettings().setDomStorageEnabled(true);
             webView.loadUrl(paymentUrl);
         }
     }
